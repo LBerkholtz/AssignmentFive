@@ -1,0 +1,176 @@
+package lberkholtz.advancedjava.assignmentfive.services;
+
+import lberkholtz.advancedjava.assignmentfive.util.DatabaseConnectionException;
+import lberkholtz.advancedjava.assignmentfive.model.StockQuote;
+import lberkholtz.advancedjava.assignmentfive.util.DatabaseUtils;
+
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+/**
+ * An implementation of the StockService interface that gets
+ * stock data from a database.
+ */
+public class DatabaseStockService implements StockService {
+
+
+    /**
+     * Return the current price for a share of stock  for the given symbol
+     *
+     * @param symbol the stock symbol of the company you want a quote for.
+     *               e.g. APPL for APPLE
+     * @return a  <CODE>BigDecimal</CODE> instance
+     * @throws StockServiceException if using the service generates an exception.
+     * If this happens, trying the service may work, depending on the actual cause of the
+     * error.
+     */
+    @Override
+    public StockQuote getQuote(String symbol) throws StockServiceException {
+        // todo - this is a pretty lame implementation why?
+        // todo - answer because it only returns the first quote it finds
+        List<StockQuote> stockQuotes = null;
+        try {
+            Connection connection = DatabaseUtils.getConnection();
+            Statement statement = connection.createStatement();
+            String queryString = "select * from quotes where symbol = '" + symbol + "'";
+
+            ResultSet resultSet = statement.executeQuery(queryString);
+            stockQuotes = new ArrayList<>(resultSet.getFetchSize());
+            while (resultSet.next()) {
+                String symbolValue = resultSet.getString("symbol");
+                Date time = resultSet.getDate("time");
+                BigDecimal price = resultSet.getBigDecimal("price");
+                stockQuotes.add(new StockQuote(price, time, symbolValue));
+            }
+
+        } catch (DatabaseConnectionException | SQLException exception) {
+            throw new StockServiceException(exception.getMessage(), exception);
+        }
+        if (stockQuotes.isEmpty()) {
+            throw new StockServiceException("There is no stock data for:" + symbol);
+        }
+        return stockQuotes.get(0);
+    }
+
+    /**
+     * Get a historical list of stock quotes for the provide symbol
+     * todo - split out duplicate code into another method when it is all working and if have time
+     * @param symbol the stock symbol to search for
+     * @param from   the date of the first stock quote
+     * @param until  the date of the last stock quote
+
+     * @return a list of StockQuote instances
+     * @throws StockServiceException if using the service generates an exception.
+     *                               If this happens, trying the service may work, depending on the actual cause of the
+     *                               error.
+     */
+    @Override
+    public List<StockQuote> getQuote(String symbol, Calendar from, Calendar until) throws StockServiceException {
+        Calendar workingdate;
+        workingdate = from;
+
+        List<StockQuote> stockQuotes = null;
+
+
+        try {
+            Connection connection = DatabaseUtils.getConnection();
+            Statement statement = connection.createStatement();
+            String queryString = "select * from quotes where symbol = '" + symbol + "'";
+
+            ResultSet resultSet = statement.executeQuery(queryString);
+            stockQuotes = new ArrayList<>(resultSet.getFetchSize());
+            while ((workingdate.before(until) || workingdate.equals(until)) && resultSet.next()) {
+
+                String symbolValue = resultSet.getString("symbol");
+                Date time = resultSet.getDate("time");
+                BigDecimal price = resultSet.getBigDecimal("price");
+                stockQuotes.add(new StockQuote(price, time, symbolValue));
+                workingdate.add(Calendar.DAY_OF_YEAR, 1);
+
+            }
+        }
+
+        catch (DatabaseConnectionException | SQLException exception) {
+            throw new StockServiceException(exception.getMessage(), exception);
+        }
+        if (stockQuotes.isEmpty()) {
+            throw new StockServiceException("There is no stock data for:" + symbol);
+        }
+
+        return stockQuotes;
+    }
+    /**
+     * Get a historical list of stock quotes for the provide symbol
+     * todo - split out duplicate code when it is all working
+     * @param symbol the stock symbol to search for
+     * @param from   the date of the first stock quote
+     * @param until  the date of the last stock quote
+     * @param interval­ the number of StockQuotes to get. E.g. if Interval.DAILY was
+     *        specified one StockQuote per day will be returned.
+     * @return a list of StockQuote instances
+     * @throws StockServiceException if using the service generates an exception.
+     *                               If this happens, trying the service may work, depending on the actual cause of the
+     *                               error.
+     */
+    @Override
+    public List<StockQuote> getQuote(String symbol, Calendar from, Calendar until, Interval interval) throws StockServiceException {
+        Calendar workingdate;
+        workingdate = from;
+        workingdate.set(Calendar.HOUR_OF_DAY, 0);
+        workingdate.set(Calendar.MINUTE, 0);
+        workingdate.set(Calendar.SECOND, 0);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateFrom =sdf.format(from.getTime());
+        String dateUntil =sdf.format(until.getTime());
+
+
+        List<StockQuote> stockQuotes = null;
+
+
+            try {
+                Connection connection = DatabaseUtils.getConnection();
+                Statement statement = connection.createStatement();
+                String queryString = "select * from quotes where symbol = '" + symbol + "' and time between '" + dateFrom + "' and '" + dateUntil + "'";
+                System.out.println(from);
+                ResultSet resultSet = statement.executeQuery(queryString);
+                stockQuotes = new ArrayList<>(resultSet.getFetchSize());
+                while ((workingdate.before(until) || workingdate.equals(until)) && resultSet.next()) {
+
+                    String symbolValue = resultSet.getString("symbol");
+                    Date time = resultSet.getDate("time");
+                    BigDecimal price = resultSet.getBigDecimal("price");
+                    stockQuotes.add(new StockQuote(price, time, symbolValue));
+                    if (interval == Interval.HOURLY) {
+                        workingdate.add(Calendar.HOUR_OF_DAY, 1);
+                    } else if (interval == Interval.DAILY) {
+                        workingdate.add(Calendar.DAY_OF_YEAR, 1);
+                    } else if (interval == Interval.WEEKLY) {
+                        workingdate.add(Calendar.DAY_OF_YEAR, 7);
+                    } else if (interval == Interval.MONTHLY) {
+                        workingdate.add(Calendar.MONTH, 1);
+                    } else // should never need but just in case
+                    {
+                        workingdate = until;
+                    }
+                }
+            }
+
+             catch (DatabaseConnectionException | SQLException exception) {
+                throw new StockServiceException(exception.getMessage(), exception);
+            }
+            if (stockQuotes.isEmpty()) {
+                throw new StockServiceException("There is no stock data for:" + symbol + "  from date " + dateFrom + "through date" + dateUntil);
+            }
+
+        return stockQuotes;
+    }
+}
