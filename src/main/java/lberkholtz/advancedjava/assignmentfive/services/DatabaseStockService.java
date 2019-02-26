@@ -63,6 +63,7 @@ public class DatabaseStockService implements StockService {
     /**
      * Get a historical list of stock quotes for the provide symbol
      * todo - split out duplicate code into another method when it is all working and if have time
+     * todo - rewrite this to get just one stock quote for every date. Right now it works beccause there is not more than one quote per day in the database
      * @param symbol the stock symbol to search for
      * @param from   the date of the first stock quote
      * @param until  the date of the last stock quote
@@ -81,12 +82,14 @@ public class DatabaseStockService implements StockService {
 
 
         try {
+            //connect to local database
             Connection connection = DatabaseUtils.getConnection();
             Statement statement = connection.createStatement();
             String queryString = "select * from quotes where symbol = '" + symbol + "'";
 
             ResultSet resultSet = statement.executeQuery(queryString);
             stockQuotes = new ArrayList<>(resultSet.getFetchSize());
+            //get stock quotes, increase workingdate by one until it reaches the until date
             while ((workingdate.before(until) || workingdate.equals(until)) && resultSet.next()) {
 
                 String symbolValue = resultSet.getString("symbol");
@@ -110,6 +113,7 @@ public class DatabaseStockService implements StockService {
     /**
      * Get a historical list of stock quotes for the provide symbol
      * todo - split out duplicate code when it is all working
+     * todo  this only works because of the way the database is set up. Need to rewrite, sort the result in the query statement, Then check the time on the result sets. This should be broken out into methods for each interval
      * @param symbol the stock symbol to search for
      * @param from   the date of the first stock quote
      * @param until  the date of the last stock quote

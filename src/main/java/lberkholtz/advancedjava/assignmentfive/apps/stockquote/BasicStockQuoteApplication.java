@@ -16,7 +16,6 @@ public class BasicStockQuoteApplication {
 
     private StockService stockService;
 
-    // an example of how to use enum - not part of assignment 3 but useful for assignment 4
 
     /**
      * An enumeration that indicates how the program terminates (ends)
@@ -62,7 +61,7 @@ public class BasicStockQuoteApplication {
     }
 
     /**
-     * Given a <CODE>stockQuery</CODE> get back a the info about the stock to display to th user.
+     * Given a <CODE>stockQuery</CODE> get back a the info about the stock to display to the user.
      *
      * @param stockQuery the stock to get data for.
      * @return a String with the stock data in it.

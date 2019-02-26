@@ -62,6 +62,10 @@ public class StockQuery extends StockData{
         return until;
     }
 
+    /**
+     * returns the <CODE>interval</CODE> date in the current instance of StockQuery
+     * @return get the end Calendar associated with this query
+     */
     public String getInterval() {
         return interval;
     }
