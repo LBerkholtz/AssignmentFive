@@ -36,9 +36,9 @@ public class SimpleStockService implements StockService {
      * @param from   the date of the first stock quote
      * @param until  the date of the last stock quote
      * @return a list of StockQuote instances
-     * @throws   StockServiceException if using the service generates an exception.
-     * If this happens, trying the service may work, depending on the actual cause of the
-     * error.
+     * @throws StockServiceException if using the service generates an exception.
+     *                               If this happens, trying the service may work, depending on the actual cause of the
+     *                               error.
      */
     @Override
     public List<StockQuote> getQuote(String symbol, Calendar from, Calendar until) {
@@ -52,6 +52,7 @@ public class SimpleStockService implements StockService {
         }
         return stockQuotes;
     }
+
     /**
      * Get a historical list of stock quotes for the provide symbol
      *
@@ -59,30 +60,18 @@ public class SimpleStockService implements StockService {
      * @param from   the date of the first stock quote
      * @param until  the date of the last stock quote
      * @return a list of StockQuote instances
-     * @throws   StockServiceException if using the service generates an exception.
-     * If this happens, trying the service may work, depending on the actual cause of the
-     * error.
+     * @throws StockServiceException if using the service generates an exception.
+     *                               If this happens, trying the service may work, depending on the actual cause of the
+     *                               error.
      */
     @Override
     public List<StockQuote> getQuote(String symbol, Calendar from, Calendar until, Interval interval) {
         // a dead simple implementation.
         List<StockQuote> stockQuotes = new ArrayList();
-        Calendar workingdate = from;
-        while (workingdate.before(until) || workingdate.equals(until)){
-            Date aDay = workingdate.getTime();
+        Date aDay = from.getTime();
+        while (until.after(aDay)) {
             stockQuotes.add(new StockQuote(new BigDecimal(100), aDay, symbol));
-            if (interval == Interval.HOURLY) {
-                workingdate.add(Calendar.HOUR_OF_DAY, 1);
-            } else if (interval == Interval.DAILY) {
-                workingdate.add(Calendar.DAY_OF_YEAR, 1);
-            } else if (interval == Interval.WEEKLY) {
-                workingdate.add(Calendar.DAY_OF_YEAR, 7);
-            } else if (interval == Interval.MONTHLY) {
-                workingdate.add(Calendar.MONTH, 1);
-            } else // should never need but just in case
-            {
-                workingdate = until;
-            }
+            from.add(Calendar.DAY_OF_YEAR, 1);
             aDay = from.getTime();
         }
         return stockQuotes;

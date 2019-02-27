@@ -10,11 +10,6 @@ import java.util.List;
  */
 public interface StockService {
 
-    public enum Interval{
-
-        HOURLY,DAILY,WEEKLY,MONTHLY;
-    }
-
 
     /**
      * Return the current price for a share of stock  for the given symbol

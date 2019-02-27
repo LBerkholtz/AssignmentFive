@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -143,38 +144,59 @@ public class DatabaseStockService implements StockService {
             try {
                 Connection connection = DatabaseUtils.getConnection();
                 Statement statement = connection.createStatement();
-                String queryString = "select * from quotes where symbol = '" + symbol + "' and time between '" + dateFrom + "' and '" + dateUntil + "'";
-                System.out.println(from);
+                String queryString = "select * from quotes where symbol = '" + symbol + "' and time between '" + dateFrom + "' and '" + dateUntil + "'" ;
                 ResultSet resultSet = statement.executeQuery(queryString);
                 stockQuotes = new ArrayList<>(resultSet.getFetchSize());
-                while ((workingdate.before(until) || workingdate.equals(until)) && resultSet.next()) {
-
+                StockQuote previousStockQuote = null;
+                Calendar calendar = Calendar.getInstance();
+                while (resultSet.next()) {
                     String symbolValue = resultSet.getString("symbol");
-                    Date time = resultSet.getDate("time");
+                    Timestamp timeStamp = resultSet.getTimestamp("time");
+                    calendar.setTimeInMillis(timeStamp.getTime());
                     BigDecimal price = resultSet.getBigDecimal("price");
-                    stockQuotes.add(new StockQuote(price, time, symbolValue));
-                    if (interval == Interval.HOURLY) {
-                        workingdate.add(Calendar.HOUR_OF_DAY, 1);
-                    } else if (interval == Interval.DAILY) {
-                        workingdate.add(Calendar.DAY_OF_YEAR, 1);
-                    } else if (interval == Interval.WEEKLY) {
-                        workingdate.add(Calendar.DAY_OF_YEAR, 7);
-                    } else if (interval == Interval.MONTHLY) {
-                        workingdate.add(Calendar.MONTH, 1);
-                    } else // should never need but just in case
-                    {
-                        workingdate = until;
-                    }
-                }
-            }
+                    java.util.Date time = calendar.getTime();
+                    StockQuote currentStockQuote = new StockQuote(price, time, symbolValue);
 
-             catch (DatabaseConnectionException | SQLException exception) {
+                    if (previousStockQuote == null) { // first time through always add stockquote
+
+                        stockQuotes.add(currentStockQuote);
+
+                    } else if (isInterval(currentStockQuote.getDate(),
+                            interval,
+                            previousStockQuote.getDate())) {
+
+                        stockQuotes.add(currentStockQuote);
+                    }
+
+                    previousStockQuote = currentStockQuote;
+                }
+
+            } catch (DatabaseConnectionException | SQLException exception) {
                 throw new StockServiceException(exception.getMessage(), exception);
             }
-            if (stockQuotes.isEmpty()) {
-                throw new StockServiceException("There is no stock data for:" + symbol + "  from date " + dateFrom + "through date" + dateUntil);
-            }
+        if (stockQuotes.isEmpty()) {
+            throw new StockServiceException("There is no stock data for:" + symbol);
+        }
 
         return stockQuotes;
     }
+
+
+    /**
+     * Returns true if the currentStockQuote has a date that is later by the time
+     * specified in the interval value from the previousStockQuote time.
+     *
+     * @param endDate   the end time
+     * @param interval  the period of time that must exist between previousStockQuote and currentStockQuote
+     *                  in order for this method to return true.
+     * @param startDate the starting date
+     * @return
+     */
+    private boolean isInterval(java.util.Date endDate, Interval interval, java.util.Date startDate) {
+        Calendar startDatePlusInterval = Calendar.getInstance();
+        startDatePlusInterval.setTime(startDate);
+        startDatePlusInterval.add(Calendar.MINUTE, interval.getMinutes());
+        return endDate.after(startDatePlusInterval.getTime());
+    }
+
 }
