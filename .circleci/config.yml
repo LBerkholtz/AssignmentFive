@@ -8,6 +8,13 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:8-jdk
+       - image: circleci/mysql:5.7
+        command: [--default-authentication-plugin=mysql_native_password]
+        environment:
+          - MYSQL_ROOT_PASSWOR user
+          - MYSQL_DATABASE: stocks
+          - MYSQL_USER: user
+          - MYSQL_PASSWOR Lowell
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
