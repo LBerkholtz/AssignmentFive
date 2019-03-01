@@ -1,6 +1,6 @@
 # Java Maven CircleCI 2.0 configuration file
 #
-# Check https://circleci.com/docs/2.0/language-java/ for more details
+# Check circleci.com/docs/2.0/language-java for more details
 #
 version: 2
 jobs:
@@ -8,34 +8,29 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:8-jdk
-       - image: circleci/mysql:5.7
+      - image: circleci/mysql:5.7
         command: [--default-authentication-plugin=mysql_native_password]
         environment:
-          - MYSQL_ROOT_PASSWOR user
+          - MYSQL_ROOT_PASSWOR r00tp@ssw0rd
           - MYSQL_DATABASE: stocks
-          - MYSQL_USER: user
-          - MYSQL_PASSWOR Lowell
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+          - MYSQL_USER: monty
+          - MYSQL_PASSWOR some_pass
 
     working_directory: ~/repo
 
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
-    
+
     steps:
       - checkout
 
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "pom.xml" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
       - run: mvn dependency:go-offline
 
@@ -43,7 +38,9 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-        
+
       # run tests!
       - run: mvn integration-test
+
+
 
