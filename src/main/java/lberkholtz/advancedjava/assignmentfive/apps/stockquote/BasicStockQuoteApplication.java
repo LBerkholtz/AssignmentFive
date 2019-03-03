@@ -3,7 +3,7 @@ package lberkholtz.advancedjava.assignmentfive.apps.stockquote;
 import lberkholtz.advancedjava.assignmentfive.model.StockQuery;
 import lberkholtz.advancedjava.assignmentfive.services.StockService;
 import lberkholtz.advancedjava.assignmentfive.services.StockServiceException;
-import lberkholtz.advancedjava.assignmentfive.services.StockServiceFactory;
+import lberkholtz.advancedjava.assignmentfive.services.ServiceFactory;
 import lberkholtz.advancedjava.assignmentfive.model.StockQuote;
 
 import java.text.ParseException;
@@ -124,7 +124,7 @@ public class BasicStockQuoteApplication {
         try {
 
             StockQuery stockQuery = new StockQuery(args[0], args[1], args[2], args[3]);
-            StockService stockService = StockServiceFactory.getInstance();
+            StockService stockService = ServiceFactory.getStockServiceInstance();
             BasicStockQuoteApplication basicStockQuoteApplication =
                     new BasicStockQuoteApplication(stockService);
             basicStockQuoteApplication.displayStockQuotes(stockQuery);

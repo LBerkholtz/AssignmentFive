@@ -1,7 +1,12 @@
 package lberkholtz.advancedjava.assignmentfive.util;
 
-
 import com.ibatis.common.jdbc.ScriptRunner;
+
+import lberkholtz.advancedjava.assignmentfive.services.DatabasePersonService;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -93,5 +98,43 @@ public class DatabaseUtils {
         }
         return returnValue;
     }
+    private static SessionFactory sessionFactory;
+    private static Configuration configuration;
 
+    /*
+     * @return SessionFactory for use with database transactions
+     */
+    public static SessionFactory getSessionFactory() {
+
+        // singleton pattern
+        synchronized (DatabasePersonService.class) {
+            if (sessionFactory == null) {
+
+                Configuration configuration = getConfiguration();
+
+                ServiceRegistry serviceRegistry = new ServiceRegistryBuilder()
+                        .applySettings(configuration.getProperties())
+                        .buildServiceRegistry();
+
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
+            }
+        }
+        return sessionFactory;
+    }
+    /**
+     * Create a new or return an existing database configuration object.
+     *
+     * @return a Hibernate Configuration instance.
+     */
+    private static Configuration getConfiguration() {
+
+        synchronized (DatabaseUtils.class) {
+            if (configuration == null) {
+                configuration = new Configuration();
+                configuration.configure("hibernate.cfg.xml");
+            }
+        }
+        return configuration;
+    }
 }

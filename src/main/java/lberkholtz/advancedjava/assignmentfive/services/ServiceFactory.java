@@ -13,18 +13,28 @@ import java.util.List;
  * A factory that returns a <CODE>StockService</CODE> instance.
  */
 @Immutable
-public class StockServiceFactory {
+public class ServiceFactory {
 
     /**
      * Prevent instantiations
      */
-    private StockServiceFactory() {}
+    private ServiceFactory() {}
 
     /**
      * returns a DatabaseStockService instance
      * @return get a <CODE>StockService</CODE> instance
      */
-    public static StockService getInstance() {
+
+    public static PersonService getPersonServiceInstance() {
+        return new DatabasePersonService();
+    }
+    /**
+     * returns a DatabaseStockService instance
+     * @return get a <CODE>StockService</CODE> instance
+     */
+
+
+    public static StockService getStockServiceInstance() {
         return new DatabaseStockService();
     }
 
