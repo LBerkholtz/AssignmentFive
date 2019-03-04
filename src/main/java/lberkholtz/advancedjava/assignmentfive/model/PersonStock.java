@@ -7,17 +7,17 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * Models a table the combines person with their hobbies.
+ * Models a table the combines person with their stocks.
  */
 @Entity
-@Table(name = "person_stock", catalog = "stocks")
+@Table(name = "person_stocks", catalog = "stocks")
 public class PersonStock {
     private int id;
     private Person person;
-    private String symbol;
+    private String person_symbol;
 
     /**
-     * Create a PersonHobby that needs to be initialized
+     * Create a PersonStock that needs to be initialized
      */
     public PersonStock() {
         // this empty constructor is required by hibernate framework
@@ -25,10 +25,10 @@ public class PersonStock {
     }
 
     /**
-     * Create a valid PersonHobby
+     * Create a valid PersonStock
      *
      * @param person the person to assign the hobby to
-     * @param symbol  the hobby to associate the person with
+     * @param symbol  the stock to associate the person with
      */
     public PersonStock(Person person, String symbol) {
         setSymbol(symbol);
@@ -48,7 +48,7 @@ public class PersonStock {
 
     /**
      * Set the unique ID for a particular row in the person_hobby table.
-     * This method should not be called by client code. The value is managed in internally.
+     * This method should not be called by client code. The value is managed internally.
      *
      * @param id a unique value.
      */
@@ -79,10 +79,9 @@ public class PersonStock {
      *
      * @return get the Symbol associated with this Person
      */
-    @ManyToOne
 
     public String getSymbol() {
-        return symbol;
+        return person_symbol;
     }
 
     /**
@@ -91,7 +90,7 @@ public class PersonStock {
      * @param symbol a stock symbol
      */
     public void setSymbol(String symbol) {
-        this.symbol = symbol;
+        this.person_symbol = symbol;
     }
 
     @Override
@@ -110,7 +109,7 @@ public class PersonStock {
     public int hashCode() {
         int result = id;
         result = 31 * result + person.hashCode();
-        result = 31 * result + symbol.hashCode();
+        result = 31 * result + person_symbol.hashCode();
         return result;
     }
 
@@ -119,7 +118,7 @@ public class PersonStock {
         return "PersonStock{" +
                 "id=" + id +
                 ", person=" + person +
-                ", symbol=" + symbol +
+                ", symbol=" + person_symbol +
                 '}';
     }
 }

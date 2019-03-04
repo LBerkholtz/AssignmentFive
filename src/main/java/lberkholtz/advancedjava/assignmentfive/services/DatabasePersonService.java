@@ -19,9 +19,6 @@ import java.util.List;
 public class DatabasePersonService implements PersonService {
 
 
-
-
-
     /**
      * Get a list of all people
      *

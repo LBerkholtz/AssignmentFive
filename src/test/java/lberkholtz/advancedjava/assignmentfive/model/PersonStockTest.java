@@ -35,7 +35,7 @@ public class PersonStockTest {
         personStock.setPerson(person);
         personStock.setSymbol("GOOG");
         assertEquals("person matches", person, personStock.getPerson());
-        assertEquals("stock matches", symbol, personStock.getSymbol());
+        assertEquals("stock matches", "GOOG", personStock.getSymbol());
         assertEquals("id matches", id, personStock.getId());
     }
 
@@ -49,7 +49,7 @@ public class PersonStockTest {
         person.setBirthDate(birthDate);
         person.setFirstName(PersonTest.firstName);
         person.setLastName(PersonTest.lastName);
-        PersonStock personStock2 = new PersonStock(person, symbol);
+        PersonStock personStock2 = new PersonStock(person, "GOOG");
         assertFalse("Different person", personStock.equals(personStock2));
     }
 

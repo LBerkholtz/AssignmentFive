@@ -7,11 +7,16 @@ import static org.junit.Assert.assertNotNull;
 /**
  * JUnit test for <CODE>StockServiceFactory</CODE>
  */
-public class StockServiceFactoryTest {
+public class ServiceFactoryTest {
 
     @Test
-    public void testGetInstance() {
+    public void testGetStockServiceInstance() {
         StockService stockService = ServiceFactory.getStockServiceInstance();
         assertNotNull(stockService);
+    }
+    @Test
+    public void testGetInstance() {
+        PersonService personService = ServiceFactory.getPersonServiceInstance();
+        assertNotNull(personService);
     }
 }

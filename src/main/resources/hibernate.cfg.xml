@@ -4,12 +4,22 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <property name="connection.url"/>
-        <property name="connection.driver_class"/>
-        <!-- <property name="connection.username"/> -->
-        <!-- <property name="connection.password"/> -->
 
-        <!-- DB schema will be updated if needed -->
-        <!-- <property name="hbm2ddl.auto">update</property> -->
+        <!-- This file contains installation specific properties used by the -->
+        <!-- HibernateUtils class.  Applications should place this file in  -->
+        <!-- the root of their class path with appropriate production values. -->
+
+        <!-- Tug database connection URL and credentials -->
+        <property name="connection.url">jdbc:mysql://localhost:3306/stocks</property>
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <property name="hibernate.connection.username">user</property>
+        <property name="hibernate.connection.password">Lowell</property>
+
+        <mapping class="lberkholtz.advancedjava.assignmentfive.model.Person"/>
+        <mapping class="lberkholtz.advancedjava.assignmentfive.model.PersonStock"/>
+
+
     </session-factory>
 </hibernate-configuration>
