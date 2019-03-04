@@ -19,6 +19,7 @@
 
         <mapping class="lberkholtz.advancedjava.assignmentfive.model.Person"/>
         <mapping class="lberkholtz.advancedjava.assignmentfive.model.PersonStock"/>
+        <mapping class="lberkholtz.advancedjava.assignmentfive.model.StockQuote"/>
 
 
     </session-factory>
