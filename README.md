@@ -1,2 +1,1 @@
-# AssignmentFive
-Week Five, Advanced Java, also contains Week Six
+# SQL and Hibernate Stock Quote App
